@@ -1,1 +1,8 @@
-#placeholder
+This is the public repository for:
+
+Use of First-Line Genome Sequencing to Diagnose Rare Genetic Disorders: A Review of the Evidence and Considerations for Patient Selection
+Kristen M Wigby, Deanna Brockman, Greg Costain, Caitlin Hale, Stacie L Taylor, John Belmont, David Bick, David Dimmock, Susan Fernbach, John Greally, Vaidehi Jobanputra11, Shashikant Kulkarni, Elizabeth Spiteri, Ryan J Taft, Medical Genome Initiative 
+
+Contents:
+"Master file 8_25_2023 ST.xlsx" contains the raw data used in the analysis. 
+"PatientSelection 20230919.qmd" is a Quarto file that contains the R code used to make the forest plots and compare subgroups.
