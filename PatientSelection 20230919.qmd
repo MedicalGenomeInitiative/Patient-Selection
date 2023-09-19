@@ -352,8 +352,16 @@ update.meta(m.prop_all,
 #### Bubble Plot
 
 ```{r}
+# Phenotype Groups
 theme_set(theme_minimal())
 ggplot(data = mgi_data, aes(x = Phenotype_Group, y = DY_percent, color = Prior_testing, fill = Prior_testing, size = Proband_count)) + geom_jitter(width = .1, height = 0) + scale_color_manual(values=c("#c9aa57ff", "#e87157ff", "#5e6aa4ff")) + theme(axis.text.x = element_text(angle = 45))
 
+
+# Population Groups
+ggplot(data = mgi_data, aes(x = Study_pop, y = DY_percent, color = Prior_testing, fill = Prior_testing, size = Proband_count)) + geom_jitter(width = .1, height = 0) + scale_color_manual(values=c("#c9aa57ff", "#e87157ff", "#5e6aa4ff")) + theme(axis.text.x = element_text(angle = 45))
+
+# Years
+x_axis_labels <- 2014:2022
+ggplot(data = mgi_data, aes(x = Year, y = DY_percent, color = Prior_testing, fill = Prior_testing, size = Proband_count)) + geom_jitter(width = .1, height = 0) + scale_color_manual(values=c("#c9aa57ff", "#e87157ff", "#5e6aa4ff")) + theme(axis.text.x = element_text(angle = 45)) + scale_x_continuous(labels = x_axis_labels, breaks = x_axis_labels)
 
 ```
