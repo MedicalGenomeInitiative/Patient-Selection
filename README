@@ -6,3 +6,4 @@ Kristen M Wigby, Deanna Brockman, Greg Costain, Caitlin Hale, Stacie L Taylor, J
 Contents:
 "Master file 8_25_2023 ST.xlsx" contains the raw data used in the analysis. 
 "PatientSelection 20230919.qmd" is a Quarto file that contains the R code used to make the forest plots and compare subgroups.
+"PatientSelection 20230919.docx" is the rendered output from the quarto file.
