@@ -1,0 +1,359 @@
+---
+title: "PatientSelection 25-Aug-2023"
+format: docx
+editor: visual
+---
+
+## Patient Selection
+
+This is a file to carry out statistical analysis and data visualizations for the MGI Patient Selection manuscript.
+
+```{r}
+#| echo: false
+#| include: false
+setwd("C:/Users/jwbht/OneDrive - Genetics & Genomics Services, Inc/Documents/MGI/PatientSelection")
+
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(patchwork)
+library(meta)
+library(quarto)
+library(forestploter)
+
+wildflower_palette <- wildflower_palette <- c("#587645ff","#abbaa2", "#494c74ff","#5e6aa4ff", "#e87157ff","#db9489ff","#957a46ff", "#c9aa57ff", "#454a49ff","#bac0b0ff")
+```
+
+### Read in the raw data
+
+```{r}
+#| echo: true
+#| include: true
+#read in the recoded raw data file
+mgi_data <- read_excel("Master file 8_25_2023 ST.xlsx", sheet = "Master")
+
+#set counts as numeric
+mgi_data$Proband_count <- as.numeric(mgi_data$Proband_count)
+mgi_data$Positive_test_count<- as.numeric(mgi_data$Positive_test_count)
+mgi_data$Year <- as.numeric(mgi_data$Year)
+
+```
+
+### Random Effects Models and Forest Plots
+
+#### All Studies
+
+```{r}
+#| echo: true
+#| include: true
+#Meta-Analysis of Proportion with Positive Molecular Diagnosis
+m.prop_all <- metaprop(event = Positive_test_count,
+                   n = Proband_count,
+                   studlab = Authors,
+                   data = mgi_data %>% drop_na(Proband_count),
+                   method = "GLMM",
+                   sm = "PLOGIT",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.ci = "CP",
+                   title = "Diagnostic Yields")
+summary(m.prop_all)
+
+
+
+```
+
+```{r}
+#| echo: true
+#| include: true
+
+#forest plot including all studies
+png(file = "forestplot_DY.png", width = 3500, height = 5000, res = 300)
+forest.meta(m.prop_all, 
+            sortvar = DY_percent, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "ACR_FINAL"),
+            leftlabs = c("Author", "Events", "Total", "Quality"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_DY.png')
+
+png(file = "forestplot_qual.png", width = 3500, height = 5000, res = 300)
+forest.meta(m.prop_all, 
+            sortvar = ACR_FINAL, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "ACR_FINAL"),
+            leftlabs = c("Author", "Events", "Total", "Quality"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_qual.png')
+
+png(file = "forestplot_phen.png", width = 3500, height = 5000, res = 300)
+forest.meta(m.prop_all, 
+            sortvar = Phenotype_Group, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "Phenotype_Group"),
+            leftlabs = c("Author", "Events", "Total", "Phenotype"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_phen.png')
+
+
+```
+
+#### Heterogeneous Phenotypes
+
+```{r}
+#| echo: true
+#| include: true
+
+m.prop_clin_heterogeneous <- metaprop(event = Positive_test_count,
+                   n = Proband_count,
+                   studlab = Authors,
+                   data = mgi_data %>% drop_na(Proband_count) %>% 
+                          filter(Phenotype_Group == "Heterogeneous"),
+                   method = "GLMM",
+                   sm = "PLOGIT",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.ci = "CP",
+                   title = "Diagnostic Yields")
+summary(m.prop_clin_heterogeneous)
+
+png(file = "forestplot_phen_heterogeneous.png", width = 3000, height = 2750, res = 300)
+forest.meta(m.prop_clin_heterogeneous, 
+            sortvar = DY_percent, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "ACR_FINAL"),
+            leftlabs = c("Author", "Events", "Total", "Quality"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_phen_heterogeneous.png')
+```
+
+#### ID/DD/ASD/Epilepsy
+
+```{r}
+#| echo: true
+#| include: true
+
+m.prop_clin_ID <- metaprop(event = Positive_test_count,
+                   n = Proband_count,
+                   studlab = Authors,
+                   data = mgi_data %>% drop_na(Proband_count) %>% 
+                          filter(Phenotype_Group == "ID_DD"),
+                   method = "GLMM",
+                   sm = "PLOGIT",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.ci = "CP",
+                   title = "Diagnostic Yields")
+summary(m.prop_clin_ID)
+
+png(file = "forestplot_phen_ID.png", width = 3000, height = 1500, res = 300)
+forest.meta(m.prop_clin_ID, 
+            sortvar = DY_percent, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "ACR_FINAL"),
+            leftlabs = c("Author", "Events", "Total", "Quality"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_phen_ID.png')
+```
+
+#### Other Neurological Disorders
+
+```{r}
+#| echo: true
+#| include: true
+
+m.prop_clin_neuro2 <- metaprop(event = Positive_test_count,
+                   n = Proband_count,
+                   studlab = Authors,
+                   data = mgi_data %>% drop_na(Proband_count) %>% 
+                          filter(Phenotype_Group == "Neuro_other"),
+                   method = "GLMM",
+                   sm = "PLOGIT",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.ci = "CP",
+                   title = "Diagnostic Yields")
+summary(m.prop_clin_neuro2)
+
+png(file = "forestplot_phen_neuro_other.png", width = 3000, height = 2000, res = 300)
+forest.meta(m.prop_clin_neuro2, 
+            sortvar = DY_percent, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "ACR_FINAL"),
+            leftlabs = c("Author", "Events", "Total", "Quality"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_phen_neuro_other.png')
+```
+
+#### Cardiomyopathy
+
+```{r}
+#| echo: true
+#| include: true
+
+m.prop_clin_card <- metaprop(event = Positive_test_count,
+                   n = Proband_count,
+                   studlab = Authors,
+                   data = mgi_data %>% drop_na(Proband_count) %>% 
+                          filter(Phenotype_Group == "Cardiomyopathy"),
+                   method = "GLMM",
+                   sm = "PLOGIT",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.ci = "CP",
+                   title = "Diagnostic Yields")
+summary(m.prop_clin_card)
+
+png(file = "forestplot_phen_card.png", width = 3000, height = 2000, res = 300)
+forest.meta(m.prop_clin_card, 
+            sortvar = DY_percent, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "ACR_FINAL"),
+            leftlabs = c("Author", "Events", "Total", "Quality"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_phen_card.png')
+```
+
+#### Ophthalmologic Disorders
+
+```{r}
+#| echo: true
+#| include: true
+
+m.prop_clin_ophth <- metaprop(event = Positive_test_count,
+                   n = Proband_count,
+                   studlab = Authors,
+                   data = mgi_data %>% drop_na(Proband_count) %>% 
+                          filter(Phenotype_Group == "Ophthalmic"),
+                   method = "GLMM",
+                   sm = "PLOGIT",
+                   fixed = FALSE,
+                   random = TRUE,
+                   method.ci = "CP",
+                   title = "Diagnostic Yields")
+summary(m.prop_clin_ophth)
+
+png(file = "forestplot_phen_ophth.png", width = 3000, height = 2000, res = 300)
+forest.meta(m.prop_clin_ophth, 
+            sortvar = DY_percent, 
+            leftcols = c("Authors", "Positive_test_count", "Proband_count", "ACR_FINAL"),
+            leftlabs = c("Author", "Events", "Total", "Quality"))
+dev.off()
+
+
+knitr::include_graphics('./forestplot_phen_ophth.png')
+```
+
+### Metaregression
+
+#### Year
+
+```{r}
+#| echo: true
+#| include: true
+
+#relationship of Year to diagnostic yield
+m.gen.year <- metareg(m.prop_all, ~Year)
+summary(m.gen.year)
+bubble(m.gen.year, studlab = F, ylim = c(-3,2))
+
+```
+
+### Subgroup Meta-Analysis
+
+Is there a difference in HCM results comparing studies that included children and those that were adult patients only
+
+#### All Studies
+
+```{r}
+#| echo: true
+#| include: true
+
+#All studies by phenotype groups used for forest plots
+update.meta(m.prop_all, 
+            subgroup = Phenotype_Group, 
+            tau.common = FALSE)
+
+#All studies by ACR Quality
+update.meta(m.prop_all, 
+            subgroup = ACR_FINAL, 
+            tau.common = FALSE)
+
+#All studies by Study Population
+update.meta(m.prop_all, 
+            subgroup = Study_pop, 
+            tau.common = FALSE)
+
+#All studies and prior testing
+update.meta(m.prop_all, 
+            subgroup = Prior_testing, 
+            tau.common = FALSE)
+
+#All studies and study design - FLAGGED
+update.meta(m.prop_all, 
+            subgroup = Study_design, 
+            tau.common = FALSE)
+
+#All studies and testing strategy
+update.meta(m.prop_all, 
+            subgroup = Testing_strategy, 
+            tau.common = FALSE)
+
+
+#All studies and Panel_disease_genes
+update.meta(m.prop_all, 
+            subgroup = Panel_disease_genes, 
+            tau.common = FALSE)
+
+	
+#All studies and Initial_untargeted_analysis
+update.meta(m.prop_all, 
+            subgroup = Initial_untargeted_analysis, 
+            tau.common = FALSE)
+
+
+#All studies and Untargeted_analysis
+update.meta(m.prop_all, 
+            subgroup = Untargeted_analysis, 
+            tau.common = FALSE)
+
+
+#All studies and noncoding_analysis
+update.meta(m.prop_all, 
+            subgroup = noncoding_analysis, 
+            tau.common = FALSE)
+
+#All studies and SV_dx
+update.meta(m.prop_all, 
+            subgroup = SV_dx, 
+            tau.common = FALSE)
+
+#All studies and STR_dx
+update.meta(m.prop_all, 
+            subgroup = STR_dx, 
+            tau.common = FALSE)
+
+
+#All studies and testing strategy
+update.meta(m.prop_all, 
+            subgroup = Mito_dx, 
+            tau.common = FALSE)
+
+
+```
+
+#### Bubble Plot
+
+```{r}
+theme_set(theme_minimal())
+ggplot(data = mgi_data, aes(x = Phenotype_Group, y = DY_percent, color = Prior_testing, fill = Prior_testing, size = Proband_count)) + geom_jitter(width = .1, height = 0) + scale_color_manual(values=c("#c9aa57ff", "#e87157ff", "#5e6aa4ff")) + theme(axis.text.x = element_text(angle = 45))
+
+
+```
